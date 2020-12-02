@@ -1,0 +1,171 @@
+<?php
+
+Route::pattern('id','([0-9]+)');
+Route::pattern('slug','(.*)');
+Route::pattern('title','(.*)');
+Route::get('/', function () {
+    return view('welcome');
+});
+Route::group(['namespace'=>'Cland'], function(){
+	Route::get('/index',[
+		'uses'=>'ClandController@index',
+		'as'=>'cland.news.index'
+	]);
+	Route::get('/lien-he',[
+		'uses'=>'ClandController@contact',
+		'as'=>'cland.contact'
+	]);
+	Route::post('/lien-he',[
+		'uses'=>'ClandController@postContact',
+		'as'=>'admin.contact'
+	]);
+	Route::get('/{slug}-{id}',[
+		'uses'=>'ClandController@getNewsCat',
+		'as'=>'cland.news.cat'
+	]);
+	Route::get('/{slug}/{id}',[
+		'uses'=>'ClandController@detail',
+		'as'=>'cland.news.detail'
+	]);
+	Route::post('/{slug}/{id}',[
+		'uses'=>'ClandController@comment',
+		'as'=>'cland.comment'
+	]);
+	Route::post('/{slug}-{id}',[
+		'uses'=>'ClandController@rate',
+		'as'=>'cland.rate'
+	]);
+	Route::get('tim-kiem-tin',[
+		'uses'=>'ClandController@searchPublic',
+		'as'=>"cland.searchPublic"
+	]);
+	Route::get('categories', 'ClandController@index1');
+
+});
+Route::namespace('Admin')->prefix('admin')->middleware('auth')->group(function (){
+	Route::get('/trangchu',[
+		'uses'=>'IndexController@index',
+		'as'=>'admin.trangchu.index'
+	]);
+	Route::prefix('news')->group(function (){
+		Route::get('/index',[
+			'uses'=>'AdminNewsController@index',
+			'as'=>'admin.news.index'
+		]);
+		Route::get('/add',[
+			'uses'=>'AdminNewsController@getAdd',
+			'as'=>'admin.news.add'
+		]);
+		Route::post('/add',[
+			'uses'=>'AdminNewsController@postAdd',
+			'as'=>'admin.news.add'
+		]);
+		Route::get('/edit{id}',[
+			'uses'=>'AdminNewsController@getEdit',
+			'as'=>'admin.news.edit'
+		])->middleware('newsauth');
+		Route::post('/edit{id}',[
+			'uses'=>'AdminNewsController@postEdit',
+			'as'=>'admin.news.edit'
+		]);
+		Route::get('del{id}',[
+			'uses'=>'AdminNewsController@delNews',
+			'as'=>'admin.news.del'
+		]);
+		Route::get('/tim-kiem',[
+			'uses'=>'AdminNewsController@postSearch',
+			'as'=>'admin.news.search'
+		]);
+	});	
+	Route::prefix('cat')->group(function(){
+		Route::get('/index',[
+			'uses'=>'AdminCatController@index',
+			'as'  =>'admin.cat.index'
+		]);
+		Route::get('/edit{id}',[
+			'uses'=>'AdminCatController@getEdit',
+			'as'=>'admin.cat.edit'
+		]);
+		Route::post('/edit{id}',[
+			'uses'=>'AdminCatController@postEdit',
+			'as'  =>'admn.cat.edit'
+		]);
+		Route::get('add',[
+			'uses'=>'AdminCatController@getAdd',
+			'as'=>'admin.cat.add'
+		]);
+		Route::post('/add',[
+			'uses'=>'AdminCatController@postAdd',
+			'as'=>'admin.cat.add'
+		]);
+		Route::get('del{id}',[
+			'uses'=>'AdminCatController@del',
+			'as'=>'admin.cat.del'
+		]);
+		Route::get('/tim-kiem',[
+			'uses'=>'AdminCatController@postSearch',
+			'as'=>'admin.cat.search'
+		]);
+		Route::get('cat1','AdminCatController@cat1');
+	});
+	Route::prefix('user')->group(function(){
+		Route::get('/index',[
+			'uses'=>'AdminUserController@index',
+			'as'=>'admin.user.index'
+		]);
+		Route::get('/edit{id}',[
+			'uses'=>'AdminUserController@getEdit',
+			'as'=>'admin.user.edit'
+		])->middleware('clandauth');
+		Route::post('/edit{id}',[
+			'uses'=>'AdminUserController@postEdit',
+			'as'=>'admin.user.edit'
+		]);
+		Route::get('/add',[
+			'uses'=>'AdminUserController@getAdd',
+			'as'=>'admin.user.add'
+		])->middleware('clandauth');
+		Route::post('/add',[
+			'uses'=>'AdminUserController@postAdd',
+			'as'=>'admin.user.add'
+		]);
+		Route::get('/del{id}',[
+			'uses'=>'AdminUserController@del',
+			'as'=>'admin.user.del'
+		])->middleware('clandauth');
+		Route::get('/tim-kiem',[
+			'uses'=>'AdminUserController@postSearch',
+			'as'=>'admin.user.search'
+		]);
+	});
+	Route::get('contact',[
+		'uses'=>'AdminContactController@index',
+		'as'=>'admin.contact.index'
+	]);
+});
+Route::namespace('Auth')->group (function(){
+	Route::get('/login',[
+		'uses'=>'AuthController@getLogin',
+		'as'=>'auth.login'
+	]);
+	Route::post('/login',[
+		'uses'=>'AuthController@postLogin',
+		'as'=>'auth.login'
+	]);
+	Route::get('/logout',[
+		'uses'=>'AuthController@logout',
+		'as'=>'auth.logout'
+	]);
+	Route::get('/dang-nhap',[
+		'uses'=>'AuthPublicController@getLogin',
+		'as'=>'auth.loginPublic'
+	]);
+	Route::post('/dang-nhap',[
+		'uses'=>'AuthPublicController@postLogin',
+		'as'=>'auth.loginPublic'
+	]);
+	Route::get('/dang-xuat',[
+		'uses'=>'AuthPublicController@logout',
+		'as'=>'auth.logoutPublic'
+	]);
+});
